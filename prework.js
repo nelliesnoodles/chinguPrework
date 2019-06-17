@@ -13,11 +13,72 @@ var img_array1 = [card_back1, card_back2, card_back3, card_back4, card_back5, ca
 var img_array2 = [card_back1, card_back2, card_back3, card_back4, card_back5, card_back6, card_back7, card_back8];
 const deck_card_names = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen']
 var card_img_obj = new Map();
+// timer is for pausing the card flip on no-match
 var timer;
 var flipped_card = false;
 var first_card;
 var second_card;
 var matches_found = 0;
+var star_count = 0;
+//     the stop-clock variables
+var stop_clock = null;
+var seconds = 0;
+var minutes = 0;
+
+
+function increment(){
+  var time_element_seconds = document.getElementById("time_element_seconds");
+  var time_element_minutes = document.getElementById("time_element_minutes");
+  seconds += 1;
+  if(seconds > 59){
+    minutes += 1;
+    seconds = 0;
+  }
+
+  time_element_minutes.innerHTML = minutes;
+  time_element_seconds.innerHTML = seconds;
+  //alert(time_element_seconds);
+};
+
+
+function stars(){
+  if(star_count > 3){
+    //pass
+  }
+  else if(star_count == 3){
+    star = document.getElementById('star3');
+    star.style.color = 'blue';
+  }
+  else if(star_count == 2){
+    star = document.getElementById('star2');
+    star.style.color = 'blue';
+  }
+  else if(star_count == 1){
+    star = document.getElementById('star1');
+    star.style.color = 'blue';
+  }
+  else{
+      star1 = document.getElementById('star3');
+      star2 = document.getElementById('star2');
+      star3 = document.getElementById('star1');
+      star1.style.color = 'black';
+      star2.style.color = 'black';
+      star3.style.color = 'black';
+  }
+};
+
+function congrats(){
+  var element = document.getElementById("winner")
+  var message = "<br>You win!<br>"
+  element.innerHTML = message;
+};
+
+function clear_congrats(){
+  var element = document.getElementById("winner")
+  var message = ""
+  element.innerHTML = message;
+
+}
 
 function flip_card(){
   //alert("card flipped, event listener active");
@@ -35,15 +96,22 @@ function flip_card(){
     if(first_card === second_card){
       flipped_card = false;
       matches_found += 1;
+      star_count += 1;
+      stars()
       if(matches_found >= 8){
-        alert("congratulations");
+        congrats()
+        clear_clock();
+
       }
     }
     else{
 
       flipped_card = false;
       matches_found = 0;
+      star_count = 0;
+      stars();
       timer = window.setInterval(reset_flip, 1000);
+
     }
   }
 };
@@ -83,7 +151,10 @@ function shuffleArray(array) {
 
 
 function reset_flip(){
-
+  if(seconds > 0){
+    // this set interval waits 1 second for flip so adjust seconds -1
+  seconds -= 1;
+  }
   window.clearInterval(timer);
   flipped_card = false;
   first_card = "";
@@ -95,8 +166,18 @@ function reset_flip(){
     };
 ;}
 
+
+function clear_clock(){
+  if(stop_clock != null){
+    window.clearInterval(stop_clock);
+  }
+  seconds = 0;
+  minutes = 0;
+};
+
 function run_game(){
-  n=0;
+  clear_clock();
+  clear_congrats();
   flipped_card = false;
   for (let i=0; i<deck.length; i++){
     let element = deck[i];
@@ -107,8 +188,7 @@ function run_game(){
   shuffleArray(img_array1);
   shuffleArray(img_array2);
   assign_imgs(img_array1, img_array2, card_img_obj, deck_card_names);
+  stop_clock = window.setInterval(increment, 1000);
+
   //alert(img_array1); alert(img_array2);
 };
-
-
-//window.onload = alert(deck.length)
