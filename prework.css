@@ -6,6 +6,14 @@
 
 }
 
+img {
+  display: block;
+  height: 50%;
+  width: 50%;
+  margin-top: 25%;
+  margin-bottom: 25%;
+  margin-left: 25%;
+}
 body {
   background-image: radial-gradient(circle, black, purple, grey);
   height:100vh;
@@ -59,6 +67,7 @@ body {
   height: calc(25% - 10px);
   width: calc(25% - 10px);
   margin: 5px;
+  
 }
 
 .card:active {

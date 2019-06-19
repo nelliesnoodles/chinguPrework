@@ -1,4 +1,3 @@
-
 const deck = document.getElementsByClassName('card_image');
 const card_front = "snowflake-regular.svg";
 const card_back1 = "socks-solid.svg";
@@ -13,8 +12,7 @@ var img_array1 = [card_back1, card_back2, card_back3, card_back4, card_back5, ca
 var img_array2 = [card_back1, card_back2, card_back3, card_back4, card_back5, card_back6, card_back7, card_back8];
 const deck_card_names = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen']
 var card_img_obj = new Map();
-
-//  cards matches, sources, current, score values
+//  game variables
 var flipped_card = false;
 var first_card = {'card_id': null, 'new_src': null};
 var second_card = {'card_id': null, 'new_src': null};
@@ -27,6 +25,18 @@ var timer;
 var stop_clock = null;
 var seconds = 0;
 var minutes = 0;
+
+function activate(element_card1, element_card2){
+  element_card1.style.pointerEvents = 'auto';
+  element_card2.style.pointerEvents = 'auto';
+}
+
+function reset_active(){
+  for(var i = 0; i < deck.length; i++){
+    let card = deck[i];
+    card.style.pointerEvents = 'auto';
+  };
+}
 
 function clear_card_info(){
   //  set card key- values to null.
@@ -52,8 +62,11 @@ function increment(){
 
 
 function stars(){
+  if(star_count < 0){
+    star_count = 0;
+  }
   if(star_count > 3){
-    //pass
+    star_count = 3;
   }
   else if(star_count == 3){
     star = document.getElementById('star3');
@@ -93,30 +106,39 @@ function clear_congrats(){
 }
 
 
+// ------------------------//
+//   Main functio of game:
+//--------------------------//
+
+
 function flip_card(){
-  //alert("card flipped, event listener active");
+  //  variables in use:
   moves += 1;
   var card_id = this.id;
   var new_src = card_img_obj.get(card_id);
   var back_image = new_src.toString();
+  var element = document.getElementById(card_id);
+  element.style.pointerEvents = 'none';
   this.src = back_image;
 
+  //    ---- logic operators ----
+
   if(!flipped_card){
+    // first card selected:
   flipped_card = true;
   first_card.card_id = card_id;
   first_card.new_src = back_image;
-  console.log("first card source = ");
-  console.log(first_card.new_src);
+  //console.log("first card source = ");
+  //console.log(first_card.new_src);
   }
 
   else if(flipped_card){
-
+    // second card selected
     second_card.card_id = card_id;
     second_card.new_src = back_image;
-    console.log(second_card.new_src);
     flipped_card = false;
-    //console.log(first_card.new_src);
     if(first_card.new_src === second_card.new_src){
+      //  it's a MATCH
       matches_found += 1;
       star_count += 1;
       stars();
@@ -129,17 +151,41 @@ function flip_card(){
     }
 
     else{
+      // it's NOT a MATCH
 
       flipped_card = false;
       star_count -= 1;
       stars();
       var card1Id = first_card.card_id;
       var card2Id = second_card.card_id;
-      timer = window.setInterval(reset_flip, 1000, card1Id, card2Id);
-
+      var card1_element = document.getElementById(card1Id);
+      var card2_element = document.getElementById(card2Id);
+      // setting the interval here keeps the card images from changing too fast
+      timer = window.setInterval(reset_flip, 500, card1Id, card2Id);
+      activate(card1_element, card2_element);
     }
   }
 };
+
+
+
+function reset_flip(card1_id, card2_id){
+  // reset first_card, second_card, set values to null
+  window.clearInterval(timer);
+  flipped_card = false;
+  element1 = document.getElementById(card1_id);
+  element2 = document.getElementById(card2_id);
+  element1.src = card_front;
+  element2.src = card_front;
+  clear_card_info();
+;}
+
+
+
+//--------------------------------//
+//   shuffling and assigning img  //
+//--------------------------------//
+
 
 function assign_imgs(imgArray1, imgArray2, card_map, deck){
   var indeck = 0;
@@ -149,7 +195,7 @@ function assign_imgs(imgArray1, imgArray2, card_map, deck){
     var card_to_add_it_to = deck[indeck];
     card_map.set(card_to_add_it_to, img_to_add);
     indeck += 1;
-    //alert(indeck);
+
   };
   //assign second shuffled images to map
   for (var i = 0; i<imgArray2.length; i++){
@@ -157,7 +203,7 @@ function assign_imgs(imgArray1, imgArray2, card_map, deck){
     var card_to_add_it_to = deck[indeck];
     card_map.set(card_to_add_it_to, img_to_add);
     indeck += 1;
-    //alert(indeck);
+
   };
 }
 
@@ -165,6 +211,12 @@ function assign_imgs(imgArray1, imgArray2, card_map, deck){
 function shuffleArray(array) {
    //https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
    //  the Durstenfeld shuffle
+   // going backward through the array, pick a random number
+   // get index,  get temp, and swap it in place for current index
+   // only need to randomly swap half the index's
+   // because swap will trade out two items.
+   // on an array of length 8, only 4 swaps need to be done.
+   // on an odd length, one item will not be swapped?
     for (var i = array.length - 1; i > 0; i--) {
         var j = Math.floor(Math.random() * (i + 1));
         var temp = array[i];
@@ -174,20 +226,6 @@ function shuffleArray(array) {
 }
 
 
-
-function reset_flip(card1_id, card2_id){
-  // reset first_card, second_card, set values to null
-  console.log("reset_flip activated");
-  console.log(card1_id);
-  console.log(card2_id);
-  window.clearInterval(timer);
-  flipped_card = false;
-  element1 = document.getElementById(card1_id);
-  element2 = document.getElementById(card2_id);
-  element1.src = card_front;
-  element2.src = card_front;
-  clear_card_info();
-;}
 
 
 function clear_clock(){
@@ -199,20 +237,24 @@ function clear_clock(){
 };
 
 function run_game(){
+  var button = document.getElementById("play_button");
+  button.innerHTML = "New Game";
   clear_clock();
   clear_congrats();
+  reset_active();
+  star_count = 0;
   moves = 0;
+  matches_found = 0;
   flipped_card = false;
   for (let i=0; i<deck.length; i++){
     let element = deck[i];
-    //alert(i);
     element.addEventListener("click", flip_card);
     element.src = card_front;
   };
+  stars();
   shuffleArray(img_array1);
   shuffleArray(img_array2);
   assign_imgs(img_array1, img_array2, card_img_obj, deck_card_names);
   stop_clock = window.setInterval(increment, 1000);
 
-  //alert(img_array1); alert(img_array2);
 };
