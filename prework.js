@@ -8,6 +8,8 @@ const card_back5 = "canadian-maple-leaf-brands.svg";
 const card_back6 = "cloud-sun-rain-solid.svg";
 const card_back7 = "pagelines-brands.svg";
 const card_back8 = "tree-solid.svg";
+const back_color = "#c060fa";
+const front_color = "#eddbf9";
 var img_array1 = [card_back1, card_back2, card_back3, card_back4, card_back5, card_back6, card_back7, card_back8];
 var img_array2 = [card_back1, card_back2, card_back3, card_back4, card_back5, card_back6, card_back7, card_back8];
 const deck_card_names = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen']
@@ -120,6 +122,7 @@ function flip_card(){
   var element = document.getElementById(card_id);
   element.style.pointerEvents = 'none';
   this.src = back_image;
+  this.style.backgroundColor = front_color;
 
   //    ---- logic operators ----
 
@@ -177,6 +180,8 @@ function reset_flip(card1_id, card2_id){
   element2 = document.getElementById(card2_id);
   element1.src = card_front;
   element2.src = card_front;
+  element1.style.backgroundColor = back_color;
+  element2.style.backgroundColor = back_color;
   clear_card_info();
 ;}
 
